@@ -18,7 +18,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
 try{
 const mobileCollection = client.db('reusedMobile').collection('mobilePhones');
-
+const userCollection = client.db('reusedMobile').collection('users');
 app.get('/phones',async(req,res)=>{
   const query = {}
   const cursor =mobileCollection.find(query);
@@ -31,14 +31,53 @@ app.get('/phones/:id',async(req,res)=>{
   const id = req.params.id;
   const query = {_id:ObjectId(id)}
   const phone = await mobileCollection.findOne(query);
-  
-  res.send(phone);
   console.log(phone)
+  res.send(phone)
   
 })
 
+app.put('/user/:email', async (req, res) => {
+  const email = req.params.email
+  const user = req.body
+  const filter = { email: email }
+  const options = { upsert: true }
+  const updateDoc = {
+    $set: user,
+  }
+  const result = await usersCollection.updateOne(filter, updateDoc, options)
+  console.log(result)
+})
 
-}
+app.get('/phones',async(req,res)=>{
+  let query = {};
+  if(req.query.category){
+    query={
+      category:req.query.category
+     
+    }
+    console.log(query);
+  }
+  
+  const cursor =mobileCollection.find(query);
+  const phones = await cursor.toArray();
+  res.send(phones);
+  
+})
+app.put('/phones/:category', async(req,res)=>{
+  const category =req.params.category;
+  const filter={category:category};
+  const options ={upsert:true}
+  const product = req.body;
+  const updateDoc={
+    $set:{product},
+  }
+  console.log(req.body)
+  const result = await mobileCollection.updateOne(filter,updateDoc,options);
+  res.send(result);
+})
+
+  
+  }
 
 
 finally{
