@@ -70,6 +70,15 @@ app.get('/addProducts',async(req,res)=>{
   res.send(products);
   
 })
+app.get('/addProducts',async(req,res)=>{
+  const email = req.query.email;
+  
+  const query = {email:email}
+  const product = await addProductCollection.find(query).toArray();
+  
+  res.send(product);
+  
+})
 
 
 
