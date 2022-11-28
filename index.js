@@ -19,11 +19,20 @@ async function run(){
 try{
 const mobileCollection = client.db('reusedMobile').collection('mobilePhones');
 const userCollection = client.db('reusedMobile').collection('users');
+const addProductCollection = client.db('reusedMobile').collection('addProducts');
 app.get('/phones',async(req,res)=>{
   const query = {}
   const cursor =mobileCollection.find(query);
   const phones = await cursor.toArray();
   res.send(phones);
+  console.log(phones)
+  
+})
+app.get('/users',async(req,res)=>{
+  const query = {}
+  const cursor =userCollection.find(query);
+  const users = await cursor.toArray();
+  res.send(users);
   
 })
 
@@ -35,46 +44,34 @@ app.get('/phones/:id',async(req,res)=>{
   res.send(phone)
   
 })
-
-app.put('/user/:email', async (req, res) => {
-  const email = req.params.email
-  const user = req.body
-  const filter = { email: email }
-  const options = { upsert: true }
-  const updateDoc = {
-    $set: user,
-  }
-  const result = await usersCollection.updateOne(filter, updateDoc, options)
-  console.log(result)
-})
-
-app.get('/phones',async(req,res)=>{
-  let query = {};
-  if(req.query.category){
-    query={
-      category:req.query.category
-     
-    }
-    console.log(query);
-  }
-  
-  const cursor =mobileCollection.find(query);
-  const phones = await cursor.toArray();
-  res.send(phones);
+app.get('/users',async(req,res)=>{
+  const role = req.query.role;
+  console.log(role)
+  const query = {role:role}
+  const user = await userCollection.find(query).toArray();
+  console.log(user);
+  res.send(user);
   
 })
-app.put('/phones/:category', async(req,res)=>{
-  const category =req.params.category;
-  const filter={category:category};
-  const options ={upsert:true}
+app.post('/users',async(req,res)=>{
+  const user = req.body;
+  const result =await userCollection.insertOne(user);
+  res.send(result)
+})
+app.post('/addProducts',async(req,res)=>{
   const product = req.body;
-  const updateDoc={
-    $set:{product},
-  }
-  console.log(req.body)
-  const result = await mobileCollection.updateOne(filter,updateDoc,options);
-  res.send(result);
+  const result =await addProductCollection.insertOne(product);
+  res.send(result)
 })
+app.get('/addProducts',async(req,res)=>{
+  const query = {}
+  const cursor =addProductCollection.find(query);
+  const products = await cursor.toArray();
+  res.send(products);
+  
+})
+
+
 
   
   }
