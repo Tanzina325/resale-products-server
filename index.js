@@ -72,18 +72,26 @@ app.get('/users',async(req,res)=>{
 })
 
 
-app.get('/users',async(req,res)=>{
-  const role = req.query.role;
-  console.log(role)
-  const query = {role:role}
-  const user = await userCollection.find(query).toArray();
+app.get('/users/:email',async(req,res)=>{
+  const email = req.params.email;
+  
+  const query = {email:email}
+  const user = await userCollection.findOne(query);
   console.log(user);
   res.send(user);
+})
+
+app.get('/users/admin/:email',async(req,res)=>{
+  const email = req.params.email;
   
+  const query = {email:email}
+  const user = await userCollection.findOne(query);
+  
+  res.send({isAdmin:user.role==='admin'});
 })
 app.post('/users',async(req,res)=>{
   const user = req.body;
-  const result =await userCollection.insertOne(user);
+  const result =await userCollection.insetrOne(user);
   res.send(result)
 })
 
