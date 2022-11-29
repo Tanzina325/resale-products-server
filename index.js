@@ -17,17 +17,52 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run(){
 try{
-const mobileCollection = client.db('reusedMobile').collection('mobilePhones');
+
+const categoryCollection = client.db('reusedMobile').collection('categories');
+const productCollection = client.db('reusedMobile').collection('products');
 const userCollection = client.db('reusedMobile').collection('users');
-const addProductCollection = client.db('reusedMobile').collection('addProducts');
-app.get('/phones',async(req,res)=>{
+
+
+app.get('/category',async(req,res)=>{
   const query = {}
-  const cursor =mobileCollection.find(query);
-  const phones = await cursor.toArray();
-  res.send(phones);
-  console.log(phones)
+  const cursor =categoryCollection.find(query);
+  const category = await cursor.toArray();
+  res.send(category);
   
 })
+
+app.get('/category/:id',async(req,res)=>{
+  const id = req.params.id;
+  const query = {_id:ObjectId(id)}
+  const phone = await categoryCollection.findOne(query);
+  console.log(phone)
+  res.send(phone)
+  
+})
+app.get('/products',async(req,res)=>{
+  const category = req.query.category;
+  
+  const query = {category:category}
+  const product = await productCollection.find(query).toArray();
+  
+  res.send(product);
+  
+})
+app.post('/products',async(req,res)=>{
+  const product = req.body;
+  const result =await productCollection.insertOne(product);
+  res.send(result)
+})
+app.get('/product',async(req,res)=>{
+  const email = req.query.email;
+  
+  const query = {email:email}
+  const product = await productCollection.find(query).toArray();
+  
+  res.send(product);
+  
+})
+
 app.get('/users',async(req,res)=>{
   const query = {}
   const cursor =userCollection.find(query);
@@ -36,14 +71,7 @@ app.get('/users',async(req,res)=>{
   
 })
 
-app.get('/phones/:id',async(req,res)=>{
-  const id = req.params.id;
-  const query = {_id:ObjectId(id)}
-  const phone = await mobileCollection.findOne(query);
-  console.log(phone)
-  res.send(phone)
-  
-})
+
 app.get('/users',async(req,res)=>{
   const role = req.query.role;
   console.log(role)
@@ -58,27 +86,7 @@ app.post('/users',async(req,res)=>{
   const result =await userCollection.insertOne(user);
   res.send(result)
 })
-app.post('/addProducts',async(req,res)=>{
-  const product = req.body;
-  const result =await addProductCollection.insertOne(product);
-  res.send(result)
-})
-app.get('/addProducts',async(req,res)=>{
-  const query = {}
-  const cursor =addProductCollection.find(query);
-  const products = await cursor.toArray();
-  res.send(products);
-  
-})
-app.get('/addProducts',async(req,res)=>{
-  const email = req.query.email;
-  
-  const query = {email:email}
-  const product = await addProductCollection.find(query).toArray();
-  
-  res.send(product);
-  
-})
+
 
 
 
