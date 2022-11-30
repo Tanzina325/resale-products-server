@@ -21,6 +21,7 @@ try{
 const categoryCollection = client.db('reusedMobile').collection('categories');
 const productCollection = client.db('reusedMobile').collection('products');
 const userCollection = client.db('reusedMobile').collection('users');
+const bookingCollection = client.db('reusedMobile').collection('bookings');
 
 
 app.get('/category',async(req,res)=>{
@@ -53,6 +54,7 @@ app.post('/products',async(req,res)=>{
   const result =await productCollection.insertOne(product);
   res.send(result)
 })
+
 app.get('/product',async(req,res)=>{
   const email = req.query.email;
   
@@ -60,6 +62,13 @@ app.get('/product',async(req,res)=>{
   const product = await productCollection.find(query).toArray();
   
   res.send(product);
+  
+})
+app.get('/produc',async(req,res)=>{
+  const query = {}
+  const cursor =productCollection.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
   
 })
 app.delete('/products/:id',async(req,res)=>{
@@ -81,6 +90,29 @@ app.put('/products/:id',async(req,res)=>{
   }
   const result = await productCollection.updateOne(filter,updatedDoc,options);
   res.send(result)
+})
+app.post('/bookings',async(req,res)=>{
+  const booking = req.body;
+  const query ={
+    email:booking.email,
+    product:booking.product
+  }
+  const alreadyBooked = await bookingCollection.find(query).toArray();
+  if(alreadyBooked.length){
+    const message =`you already have a booking on ${booking.product}`;
+    return res.send({acknowledged:false,message})
+  }
+  const result =await bookingCollection.insertOne(booking);
+  res.send(result)
+})
+app.get('/bookings',async(req,res)=>{
+  const email = req.query.email;
+  
+  const query = {email:email}
+  const booking = await bookingCollection.find(query).toArray();
+  
+  res.send(booking);
+  
 })
 
 app.post('/users',async(req,res)=>{
