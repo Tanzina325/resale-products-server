@@ -62,6 +62,19 @@ app.get('/product',async(req,res)=>{
   res.send(product);
   
 })
+app.delete('/products/:id',async(req,res)=>{
+  const id = req.params.id;
+  const query = {_id:ObjectId(id)};
+  const product = await productCollection.deleteOne(query);
+  
+  res.send(product);})
+app.post('/users',async(req,res)=>{
+  const user = req.body;
+  
+  
+  const result =await userCollection.insertOne(user);
+  res.send(result)
+})
 
 app.get('/users',async(req,res)=>{
   const query = {}
@@ -70,6 +83,17 @@ app.get('/users',async(req,res)=>{
   res.send(users);
   
 })
+app.put('/users/:email', async (req, res) => {
+  const email = req.params.email
+  const user = req.body
+  const filter = { email: email }
+  const options = { upsert: true }
+  const updateDoc = {
+    $set: user
+  }
+  const result = await userCollection.updateOne(filter, updateDoc, options)
+  console.log(result)})
+
 
 
 app.get('/users/:email',async(req,res)=>{
@@ -89,17 +113,28 @@ app.get('/users/admin/:email',async(req,res)=>{
   
   res.send({isAdmin:user.role==='admin'});
 })
-app.post('/users',async(req,res)=>{
-  const user = req.body;
-  const result =await userCollection.insetrOne(user);
-  res.send(result)
+
+app.get('/users/seller/:email',async(req,res)=>{
+  const email = req.params.email;
+  
+  const query = {email:email}
+  const user = await userCollection.findOne(query);
+  
+  res.send({isSeller:user.role==='seller'});
+})
+
+app.get('/users/buyer/:email',async(req,res)=>{
+  const email = req.params.email;
+  
+  const query = {email:email}
+  const user = await userCollection.findOne(query);
+  
+  res.send({isBuyer:user.role==='buyer'});
 })
 
 
 
-
-  
-  }
+}
 
 
 finally{
