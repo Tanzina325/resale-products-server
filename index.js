@@ -67,7 +67,22 @@ app.delete('/products/:id',async(req,res)=>{
   const query = {_id:ObjectId(id)};
   const product = await productCollection.deleteOne(query);
   
-  res.send(product);})
+  res.send(product);
+})
+
+app.put('/products/:id',async(req,res)=>{
+  const id =req.params.id;
+  const filter={_id:ObjectId(id)};
+  const options ={upsert:true};
+  const updatedDoc ={
+    $set: {
+      status:'advertised'
+    }
+  }
+  const result = await productCollection.updateOne(filter,updatedDoc,options);
+  res.send(result)
+})
+
 app.post('/users',async(req,res)=>{
   const user = req.body;
   
@@ -83,17 +98,12 @@ app.get('/users',async(req,res)=>{
   res.send(users);
   
 })
-app.put('/users/:email', async (req, res) => {
-  const email = req.params.email
-  const user = req.body
-  const filter = { email: email }
-  const options = { upsert: true }
-  const updateDoc = {
-    $set: user
-  }
-  const result = await userCollection.updateOne(filter, updateDoc, options)
-  console.log(result)})
-
+app.delete('/users/:id',async(req,res)=>{
+  const id = req.params.id;
+  const query = {_id:ObjectId(id)};
+  const result = await userCollection.deleteOne(query);
+  
+  res.send(result);})
 
 
 app.get('/users/:email',async(req,res)=>{
@@ -104,6 +114,19 @@ app.get('/users/:email',async(req,res)=>{
   console.log(user);
   res.send(user);
 })
+app.put('/users/:id',async(req,res)=>{
+  const id =req.params.id;
+  const filter={_id:ObjectId(id)};
+  const options ={upsert:true};
+  const updatedDoc ={
+    $set: {
+      status:'verified'
+    }
+  }
+  const result = await userCollection.updateOne(filter,updatedDoc,options);
+  res.send(result)
+})
+
 
 app.get('/users/admin/:email',async(req,res)=>{
   const email = req.params.email;
